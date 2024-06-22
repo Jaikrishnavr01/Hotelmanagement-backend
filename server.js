@@ -1,15 +1,25 @@
+import express from 'express';
 
-import http from "node:http"
 import dotenv from 'dotenv';
+import connectDb from './Config/db.js'
+
+import hotel from './Routers/HotelRouter.js'
 
 dotenv.config();
 
+const app= express()
 
-const server = http.createServer((req,res) => {
-    res.writeHead(200,{"content-type": "text/plain"})
-    res.end("Hello")
+//monogo db 
+connectDb()
+
+app.get("/" ,(req, res) => {
+    res.send("Home Page of hotel management")
 })
 
-server.listen(process.env.PORT, () => {
+app.use("/auth", hotel);
+
+
+
+app.listen(process.env.PORT, () => {
     console.log(`server is running on port ${process.env.PORT}`);
 })
