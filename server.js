@@ -4,10 +4,12 @@ import dotenv from 'dotenv';
 import connectDb from './Config/db.js'
 
 import hotel from './Routers/HotelRouter.js'
+import cors from 'cors';
 
 dotenv.config();
 
 const app= express()
+app.use(cors());
 
 //monogo db 
 connectDb()

@@ -3,18 +3,20 @@ import mongoose from "mongoose";
 const HotelSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true
+        // required: true
     },
     email: {
         type: String,
-        required: true,
+        // required: true,
         unique: true
     },
     password: {
         type: String,
-        required: true
+        // required: true
     },
-    roomdata: {
+    token: { type: String },
+    roomdata: [
+        {
         roomType: {
             type: String,
             default: "Executive-ac"
@@ -63,6 +65,7 @@ const HotelSchema = new mongoose.Schema({
         
         }
     }
+]
 });
 
 const Hotelmodel = mongoose.model('Hoteldata', HotelSchema);
