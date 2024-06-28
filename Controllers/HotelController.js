@@ -156,3 +156,21 @@ export const Roomdata = async (req, res) => {
 };
 
 
+// Function to get all user and room data
+export const getAllData = async (req, res) => {
+    try {
+        // Fetch all users and their room data from the database
+        const users = await Hotelmodel.find();
+
+        // Return the user data
+        return res.status(200).json({
+            message: "Data retrieved successfully",
+            users: users
+        });
+
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+  
