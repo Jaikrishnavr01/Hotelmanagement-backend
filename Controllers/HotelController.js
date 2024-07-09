@@ -24,8 +24,6 @@ export const signup = async (req, res) => {
             password: hashedPassword
         });
 
-
-
         // Generate JWT token
         const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET);
         newUser.token = token;
@@ -46,6 +44,7 @@ export const signup = async (req, res) => {
     }
 };
 
+// Function to handle user signin
 export const signin = async (req, res) => {
     const { email, password } = req.body;
 
@@ -82,9 +81,6 @@ export const signin = async (req, res) => {
     }
 };
 
-
-
-
 // Middleware to verify JWT and extract userId
 export const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -102,29 +98,29 @@ export const verifyToken = (req, res, next) => {
         // Attach userId to request object
         req.user = {
             userId: decoded.userId,
-            // Add other user properties if needed
         };
         next();
     });
 };
 
+// Function to handle room data update
 export const Roomdata = async (req, res) => {
     try {
         const { roomType, roomNumber, roomStatus, roomGuestName, roomGuestPhone, roomCapacity, roomNights, roomCheckIn, roomCheckOut, roomPrice } = req.body;
 
-        // Check if there's an _id provided in the request body
-        const roomId = req.user.userId; // Assuming _id is passed in req.body
+        const userId = req.user.userId;
 
-        if (!roomId) {
-            return res.status(400).json({ message: 'Room ID (_id) is required for updating' });
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required for updating' });
         }
 
-        // Find existing room data by _id and userId
-        const existingRoomData = await Hotelmodel.findOne({ _id: roomId });
+        // Find existing room data by userId
+        const existingRoomData = await Hotelmodel.findOne({ _id: userId });
 
         if (!existingRoomData) {
             return res.status(404).json({ message: 'Room data not found or user does not have access' });
         }
+
         // Construct new room data object
         const newRoomData = {
             roomType,
@@ -155,7 +151,6 @@ export const Roomdata = async (req, res) => {
     }
 };
 
-
 // Function to get all user and room data
 export const getAllData = async (req, res) => {
     try {
@@ -173,4 +168,49 @@ export const getAllData = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
-  
+
+
+// Function to get user-specific data
+export const getUserData = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Fetch user by ID and their room data from the database
+        const user = await Hotelmodel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Return the user data
+        return res.status(200).json({
+            message: "User data retrieved successfully",
+            roomdata: user.roomdata
+        });
+
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+//delete booking  //// problem
+export const deleteBooking = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+
+        // Delete booking by ID from the database
+        const deletedBooking = await Hotelmodel.findByIdAndDelete(bookingId);
+
+        if (!deletedBooking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        // Optionally return a message confirming deletion
+        return res.status(200).json({ message: 'Booking deleted successfully' });
+
+    } catch (error) {
+        console.error("Error deleting booking:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
